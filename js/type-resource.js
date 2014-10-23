@@ -15,7 +15,10 @@ window.type = (function() {
   var SPACE = 32;
   var SHIFT = 16;
   var LEFT = 37;
+  var UP = 38;
   var RIGHT = 39;
+  var DOWN = 40;
+  var END = 35;
   var CURSOR = "\u2038";
   var LS = "\u2028"; // unicode line separator
   var PS = "\u2029"; // unicode paragraph separator
@@ -39,7 +42,7 @@ window.type = (function() {
 
     for (var i = 0; i < lines.length; i++) {
       line = (lines[i] === "") ? "&nbsp;" : lines[i];
-      html = html + '<div class="line">' + line + '</div>';
+      html = html + '<div id="L' + i.toString() + '" class="line">' + line + '</div>';
     }
 
     return html;
@@ -100,55 +103,86 @@ window.type = (function() {
   }
 
 
+  /* Get screen coordinates of cursor and figure out the equivalent
+   * insertion point on the next line (if any).
+   * http://www.quirksmode.org/dom/range_intro.html
+   */
+  function moveCursorUp() {
+    var content = getContent();
+  }
+
+  function moveCursorDown() {
+  }
+
   function handleNonPrintableKeys(e) {
     console.log('body keydown: ', e.which);
     var parts = getContent(true);
     var before = parts[0];
     var after = parts[1];
 
-    function moveCursorLeft() {
-      // setContent(content.substring(0, content.length - 1));
-    }
-
     switch (e.which) {
       case ENTER:
         setContent(before + LS + CURSOR + after);
-        refreshContent();
         break;
-
       case BACK_SPACE:
         // remove the character just before the cursor
-
-        setContent(before.substring(0, before.length - 2) + CURSOR + after);
-        refreshContent();
+        setContent(before.substring(0, before.length - 1) + CURSOR + after);
         break;
-
       case DELETE:
         // remove the character just after the cursor
+        setContent(before + CURSOR + after.substring(1));
         break;
-
-      case RIGHT:
-        before = before + after.substring(0, 1);
-        after = after.substring(1);
-        setContent(before + CURSOR + after);
-        refreshContent();
-        break;
-
       case LEFT:
         after = before.substring(before.length - 1) + after;
         before = before.substring(0, before.length - 1);
         setContent(before + CURSOR + after);
-        refreshContent();
         break;
+      case RIGHT:
+        before = before + after.substring(0, 1);
+        after = after.substring(1);
+        setContent(before + CURSOR + after);
+        break;
+      case UP:
+        moveCursorUp();
+        break;
+      case DOWN:
+        moveCursorDown();
+        break;
+      default:
+        // do not refresh content
+        return;
     }
+
+    // refresh content if key triggered an action in the switch statement
+    refreshContent();
   }
 
 
+  function getSelection() {
+    var selection;
+
+    if(window.getSelection) {
+      selection = window.getSelection();
+    } else if(document.getSelection) {
+      selection = document.getSelection();
+    } else if(document.selection) {
+      selection = document.selection.createRange().text;
+    }
+    return selection;
+  }
+
   function adjustCursorPosition(e) {
     console.log('.page click');
+    var selection = getSelection();
+    var offset = selection.anchorOffset;
+    var textNode = $(selection.anchorNode);
 
-    var index = 0;
-    // translate the x,y coords into index
+    console.log('selection', selection);
+    console.log('  offset:', offset);
+    console.log('  textNode:', textNode);
+    //debugger;
+    //var lineNum = textNode.attr('id').substring(1);
+    //console.log('  lineNum:', lineNum);
   }
 
 
