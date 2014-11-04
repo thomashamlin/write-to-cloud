@@ -1,0 +1,212 @@
+<html>
+  <head>
+    <script src="js/medium.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <link href="css/medium.css" rel="stylesheet">
+    <style>
+      @import url(http://fonts.googleapis.com/css?family=Quattrocento:700,400);
+
+      body {
+        font-size: 24px;
+        font-family: 'Vollkorn', serif;
+        font-style: normal;
+        line-height: 1.6em;
+
+        color: #999;
+        background-color: #000;
+      }
+      .toolbar {
+        position: fixed;
+      }
+
+      /* Styles by Thomas */
+      .page {
+        margin: 5em;
+        padding: 1em;
+        font-size: 1em;
+      }
+      .page p {
+      }
+
+      [data-editable]:focus {
+        outline: none;
+      }
+
+      button {
+        color: #999;
+        background-color: #111;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <button data-action="fullscreen"><span class="glyphicon
+          glyphicon-fullscreen">fullscreen</span></button>
+    </div>
+    <div class="page">
+      <h2 id="title" data-editable data-edit-placeholder="Title" data-edit-mode="inline"></h2>
+      <div id="editor" data-editable data-edit-placeholder="Body"></div>
+    </div>
+
+<script>
+/* My customizations here:
+ * - explore different medium.js settings
+ * - declarative API for making elements editable, via data-editable and data-edit-*
+ * - fullscreen button
+ * - simple styles including a Google webfont
+ * - cache to localStorage as user types
+ * upcoming:
+ * - sync content with cloud services (Dropbox, Google Drive, etc)
+ * - load content from cloud services
+ * - user-visible settings
+ */
+$(function() {
+  $('[data-editable]').each(makeEditable);
+
+  $(".toolbar button").on('click', function(e) {
+    // map the button's data-action attribute to a function
+    toolbarActions[$(this).data('action')]();
+  });
+
+});
+
+
+var cacheTimeoutIDs = {};
+var cacheTimeoutMsecs = 200;
+var toolbarActions = {
+  'fullscreen': function() {
+    var elem = $('body')[0];
+    if (elem.requestFullscreen) {
+      page.requestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    }
+  }
+};
+// Some key codes
+var BACK_SPACE = 8;
+var DELETE = 46;
+var ENTER = 13;
+var SPACE = 32;
+var SHIFT = 16;
+var LEFT = 37;
+var UP = 38;
+var RIGHT = 39;
+var DOWN = 40;
+var END = 35;
+var CURSOR = "\u2038";
+var LS = "\u2028"; // unicode line separator
+var PS = "\u2029"; // unicode paragraph separator
+
+
+/* Make an element editable via medium.js.
+ * Supports configuration of the medium.js via a data-* API:
+ *   data-edit-mode: [rich, inline, partial]
+ *   data-edit-placeholder: string
+ *   ...
+ */
+function makeEditable() {
+  var mode = $(this).data('edit-mode');
+  var modes = {
+    'rich': Medium.richMode,
+    'inline': Medium.inlineMode,
+    'partial': Medium.partialMode
+  };
+
+  var medium = new Medium({
+    // Called at the start of a paste operation
+    beforeInsertHtml: function () {
+      var medium = this;
+    },
+    autoHR: false,
+    element: this,
+    mode: modes[$(this).data('edit-mode') || 'rich'],
+    pasteAsText: false,
+    placeholder: $(this).data('edit-placeholder') || ''
+  });
+
+  // Restore value from localStorage
+  medium.value(localStorage.getItem(key(medium)));
+
+  $(this)
+    .on('keypress', {medium: medium}, handlePrintableKeys)
+    .on('keydown', {medium: medium}, handleNonPrintableKeys);
+}
+
+
+
+function key(medium) {
+  return window.location.pathname + '#' + medium.element.id;
+}
+
+
+/* Reset a timer for this medium object to save its state to local storage
+ * after specified idle time.
+ *
+ *   @medium: Medium.js object
+ *   @timeoutMsecs: milliseconds to wait before caching
+ */
+function resetCacheTimeout(medium, timeoutMsecs) {
+  console.log('resetCacheTimeout');
+  var ms = timeoutMsecs || cacheTimeoutMsecs;
+  var timeoutID = medium.element.id;
+
+  window.clearTimeout(cacheTimeoutIDs[timeoutID]);
+
+  cacheTimeoutIDs[timeoutID] = window.setTimeout(function () {
+    console.log('  caching');
+    localStorage.setItem(key(medium), medium.value());
+  }, ms);
+}
+
+
+function handlePrintableKeys(e) {
+  console.log('keypress (printable)');
+  console.log('  ', e.which, ' == ', String.fromCharCode(e.which));
+  var medium = e.data.medium;
+
+  resetCacheTimeout(medium);
+
+  // Periodically sync with cloud
+  // e.g. every 10 key strokes or every 10 seconds
+
+}
+
+function handleNonPrintableKeys(e) {
+  console.log('keydown: ', e.which);
+  var medium = e.data.medium;
+
+  switch (e.which) {
+    case ENTER:
+      //resetCacheTimeout(medium);
+      break;
+    case BACK_SPACE:
+      resetCacheTimeout(medium);
+      break;
+    case DELETE:
+      resetCacheTimeout(medium);
+      break;
+    //case PASTE:
+    //  resetCacheTimeout(medium);
+    //  break;
+    case LEFT:
+      break;
+    case RIGHT:
+      break;
+    case UP:
+      break;
+    case DOWN:
+      break;
+    default:
+      // do not refresh content
+      return;
+  }
+}
+</script>
+  </body>
+</html>

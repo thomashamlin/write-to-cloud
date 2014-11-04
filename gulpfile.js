@@ -41,12 +41,17 @@ gulp.task('js', function() {
 // External resources
 
 gulp.task('bower_js', function() {
-  return gulp.src('bower_components/**/*.{min.js,min.js.map}')
+  return gulp.src('bower_components/**/*.{js,min.js,min.js.map}')
     .pipe(flatten())
     .pipe(gulp.dest('build/js'));
 });
 
-gulp.task('build', ['css', 'html', 'js', 'bower_js']);
+gulp.task('bower_css', function() {
+  return gulp.src('bower_components/medium.js/medium.css')
+    .pipe(gulp.dest('build/css'));
+});
+
+gulp.task('build', ['css', 'html', 'js', 'bower_js', 'bower_css']);
 
 gulp.task('watch', function () {
   gulp.watch('less/*.less', ['css']);

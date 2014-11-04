@@ -185,11 +185,14 @@ window.type = (function() {
     //console.log('  lineNum:', lineNum);
   }
 
+  function saveToLocalStorage() {
+  }
 
   function setupHandlers() {
-    $(document).on('keypress', handlePrintableKeys);
-    $(document).on('keydown', handleNonPrintableKeys);
-    $('.page').on('click', adjustCursorPosition);
+    //$(document).on('keypress', handlePrintableKeys);
+    //$(document).on('keydown', handleNonPrintableKeys);
+    $(document).on('keyup', saveToLocalStorage);
+    //$('.page').on('click', adjustCursorPosition);
   }
 
 
