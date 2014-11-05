@@ -1,15 +1,16 @@
 {
-  "name": "type-project",
+  "name": "writetocloud",
   "version": "1.0.0",
   "authors": [
     "Thomas Hamlin <thomas@metaphorlab.com>"
   ],
   "description": "Essential interface for thought conveyance",
   "keywords": [
+    "authoring",
+    "editor",
     "journal",
     "notes",
     "typing",
-    "authoring",
     "writing"
   ],
   "license": "MIT",
@@ -21,8 +22,6 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.3.0",
-    "bootstrap": "~3.2.0",
     "jquery": "~2.1.1",
     "medium.js": "*"
   }

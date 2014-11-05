@@ -1,27 +1,39 @@
 @base-size: 16px;
-@text-color: #444;
-@bg-color: #eee;
+@text-color: #aaa;
+@bg-color: #000;
 
 body {
   font-size: 2 * @base-size;
-  font-family: sans-serif;
+  font-family: 'Alegreya', serif;
+  font-style: normal;
+  line-height: 1.6em;
 
-  background-color: darken(@bg-color, 10%);
-
-  padding: 5em;
+  color: @text-color;
+  background-color: @bg-color;
 }
 
 .page {
-  color: @text-color;
-  background-color: @bg-color;
-
   padding: 1em;
-
-  .line {
-    line-height: 1.5em;
-  }
+  margin: 5em;
 }
 
-.placeholder {
+
+.Medium-placeholder {
   color: lighten(@text-color, 20%);
+}
+
+.toolbar {
+  position: fixed;
+}
+
+// Prevent blue outline when active
+[data-editable]:focus {
+  outline: none;
+}
+
+// Quick and dirty styles for making buttons more subtle
+button {
+  color: #999;
+  background-color: #111;
+  border: none;
 }
