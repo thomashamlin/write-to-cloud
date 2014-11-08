@@ -2,6 +2,11 @@
   'use strict';
 
   var actions = {
+    // Open a Dropbox authentication dialog to establish a connection
+    'dropbox': function() {
+      wtc.dropbox.client.authenticate();
+    },
+
     'fullscreen': function() {
       var elem = $('body')[0];
       if (elem.requestFullscreen) {

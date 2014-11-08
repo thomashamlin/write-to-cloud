@@ -1,21 +1,113 @@
 <html>
   <head>
-    <title>Type</title>
-    <script src="js/angular.min.js"></script>
     <script src="js/jquery.min.js"></script>
+    <script src="js/dropbox-datastores-1.2.0.js"></script>
+    <script src="js/medium.js"></script>
     <script src="js/writetocloud.js"></script>
-    <style type="text/css">
-      @import "css/writetocloud.css";
+    <link href="css/medium.css" rel="stylesheet">
+    <style>
+      @import url(http://fonts.googleapis.com/css?family=Alegreya:400italic,400,700);
+      @import url(css/writetocloud.css);
     </style>
   </head>
   <body>
-    <div class="page">
-      <div id="title"></div>
-      <div id="content"></div>
-
-      <h4>Editable</h4>
-      <div contenteditable="true">
-      </div>
+    <div class="toolbar">
+      <button data-action="fullscreen"><span class="glyphicon glyphicon-fullscreen">fullscreen</span></button>
+      <button data-action="dropbox">Dropbox</button>
     </div>
+    <div class="page">
+      <h2 id="title" data-editable data-edit-placeholder="Title" data-edit-mode="inline"></h2>
+      <div id="editor" data-editable data-edit-placeholder="Body"></div>
+    </div>
+
+<script>
+/* My customizations here:
+ * - explore different medium.js settings
+ * - declarative API for making elements editable, via data-editable and data-edit-*
+ * - fullscreen button
+ * - simple styles including a Google webfont
+ * - cache to localStorage as user types
+ * upcoming:
+ * - sync content with cloud services (Dropbox, Google Drive, etc)
+ * - load content from cloud services
+ * - user-visible settings
+ */
+$(function() {
+  $('[data-editable]').each(makeEditable);
+
+  wtc.toolbar.init(".toolbar button");
+});
+
+
+/* Make an element editable via medium.js.
+ * Supports configuration of the medium.js via a data-* API:
+ *   data-edit-mode: [rich, inline, partial]
+ *   data-edit-placeholder: string
+ *   ...
+ */
+function makeEditable() {
+  var mode = $(this).data('edit-mode');
+  var modes = {
+    'rich': Medium.richMode,
+    'inline': Medium.inlineMode,
+    'partial': Medium.partialMode
+  };
+
+  var medium = new Medium({
+    // Called at the start of a paste operation
+    beforeInsertHtml: function () {
+      var medium = this;
+    },
+    autoHR: false,
+    element: this,
+    mode: modes[$(this).data('edit-mode') || 'rich'],
+    pasteAsText: false,
+    placeholder: $(this).data('edit-placeholder') || ''
+  });
+
+  // Restore value from localStorage
+  medium.value(wtc.cache.getValue(medium));
+
+  $(this)
+    .on('keypress', {medium: medium}, handlePrintableKeys)
+    .on('keydown', {medium: medium}, handleNonPrintableKeys);
+}
+
+
+function handlePrintableKeys(e) {
+  console.log('keypress (printable)');
+  console.log('  ', e.which, ' == ', String.fromCharCode(e.which));
+  var medium = e.data.medium;
+
+  wtc.cache.resetCacheTimeout(medium);
+
+  // Periodically sync with cloud
+  // e.g. every 10 key strokes or every 10 seconds
+
+}
+
+function handleNonPrintableKeys(e) {
+  console.log('keydown: ', e.which);
+  var medium = e.data.medium;
+
+  switch (e.which) {
+    case wtc.ENTER:
+      //wtc.cache.resetCacheTimeout(medium);
+      break;
+    case wtc.BACK_SPACE:
+      wtc.cache.resetCacheTimeout(medium);
+      break;
+    case wtc.DELETE:
+      wtc.cache.resetCacheTimeout(medium);
+      break;
+    //case wtc.PASTE:
+    //  wtc.cache.resetCacheTimeout(medium);
+    //  break;
+    default:
+      // do not refresh content
+      return;
+  }
+}
+</script>
   </body>
 </html>

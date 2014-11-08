@@ -17,6 +17,10 @@
     return localStorage.getItem(cacheKey(medium));
   }
 
+  function setValue(medium) {
+    console.log('  caching');
+    localStorage.setItem(cacheKey(medium), medium.value());
+  }
 
   /* Reset a timer for this medium object to save its state to local storage
    * after specified idle time.
@@ -26,15 +30,14 @@
    */
   function resetCacheTimeout(medium, timeoutMsecs) {
     console.log('resetCacheTimeout');
-    var ms = timeoutMsecs || wtc.cacheTimeoutMsecs;
+    var ms = timeoutMsecs || wtc.settings.cacheTimeoutMsecs;
     // timeouts are identified simply by the ID of their Medium element
     var timeoutID = medium.element.id;
 
     window.clearTimeout(cacheTimeoutIDs[timeoutID]);
 
     cacheTimeoutIDs[timeoutID] = window.setTimeout(function () {
-      console.log('  caching');
-      localStorage.setItem(cacheKey(medium), medium.value());
+      setValue(medium);
     }, ms);
   }
 

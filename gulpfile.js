@@ -55,10 +55,16 @@ gulp.task('bower_css', function() {
     .pipe(gulp.dest('build/css'));
 });
 
+// JavaScript from external projects copied directly to the build/js folder
+gulp.task('other_js', function() {
+  return gulp.src('js/ext/*.js')
+    .pipe(gulp.dest('build/js'));
+});
+
 
 // High level tasks
 
-gulp.task('build', ['css', 'html', 'js', 'bower_js', 'bower_css']);
+gulp.task('build', ['css', 'html', 'js', 'bower_js', 'other_js', 'bower_css']);
 
 gulp.task('watch', function () {
   gulp.watch('less/*.less', ['css']);
