@@ -7,6 +7,16 @@
       wtc.dropbox.client.authenticate();
     },
 
+    'browse': function() {
+      wtc.dropbox.chooser(function(content) {
+        wtc.editor.medium.value(content);
+      });
+    },
+
+    'save': function() {
+      wtc.dropbox.saver();
+    },
+
     'fullscreen': function() {
       var elem = $('body')[0];
       if (elem.requestFullscreen) {
