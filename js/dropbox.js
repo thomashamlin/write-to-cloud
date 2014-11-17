@@ -44,9 +44,11 @@
     Dropbox.choose({
       success: function(files) {
         var file = files[0];
-        console.log('user selected file.link: ', file.link);
+        console.log('user selected file: ', file);
 
-        $.get(file.link, fileSelectedCallback);
+        $.get(file.link, function(data) {
+          fileSelectedCallback(file.name, data);
+        });
       },
       extensions: ['.txt', '.html'],
       linkType: 'direct',
@@ -59,7 +61,11 @@
    * Opens the Dropbox Saver drop-in.
    * Saves the editor's value to the file.
    */
-  function saver() {
+  function saver(url, filename, successCallback) {
+    Dropbox.save({
+      files: [{url: url, filename: filename}],
+      success: successCallback,
+    });
   }
 
 
@@ -67,7 +73,8 @@
     client: client,
     chooser: chooser,
     datastore: datastore,
-    init: init
+    init: init,
+    saver: saver
   };
 
 })(window.wtc);

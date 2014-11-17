@@ -14,7 +14,7 @@ body {
 
 .page {
   padding: 1em;
-  margin: 5em;
+  margin: 1em 5em;
 }
 
 
@@ -24,6 +24,15 @@ body {
 
 .toolbar {
   position: fixed;
+  top: 1em;
+
+  button {
+    display: block;
+    cursor: pointer;
+    padding: .5em;
+    margin: .5em;
+    width: 100%;
+  }
 }
 
 // Prevent blue outline when active
@@ -36,4 +45,12 @@ button {
   color: #999;
   background-color: #111;
   border: none;
+}
+
+// Indicate that the content hasn't been saved to a cloud service
+.unsaved {
+  button[data-action=save] {
+    // keep it subtle
+    color: white;
+  }
 }

@@ -8,13 +8,15 @@
     },
 
     'browse': function() {
-      wtc.dropbox.chooser(function(content) {
-        wtc.editor.medium.value(content);
+      wtc.dropbox.chooser(function(filename, content) {
+        wtc.editor.loadFile(name, content);
       });
     },
 
     'save': function() {
-      wtc.dropbox.saver();
+      wtc.dropbox.saver(function() {
+        wtc.editor.unsaved(false);
+      });
     },
 
     'fullscreen': function() {

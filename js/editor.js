@@ -65,6 +65,7 @@
     console.log('keypress (printable)');
     console.log('  ', e.which, ' == ', String.fromCharCode(e.which));
     var medium = e.data.medium;
+    unsaved(true);
 
     wtc.cache.resetCacheTimeout(medium);
 
@@ -79,13 +80,16 @@
 
     switch (e.which) {
       case keyCode.ENTER:
-        //wtc.cache.resetCacheTimeout(medium);
+        wtc.cache.resetCacheTimeout(medium);
+        unsaved(true);
         break;
       case keyCode.BACK_SPACE:
         wtc.cache.resetCacheTimeout(medium);
+        unsaved(true);
         break;
       case keyCode.DELETE:
         wtc.cache.resetCacheTimeout(medium);
+        unsaved(true);
         break;
       //case keyCode.PASTE:
       //  wtc.cache.resetCacheTimeout(medium);
@@ -97,9 +101,28 @@
   }
 
 
+  /**
+   * Inform user that the current editor needs to be saved.
+   */
+  function unsaved(isUnsaved) {
+    $('body').toggleClass('unsaved', isUnsaved);
+  }
+
+
+  /*
+   * Set value of editor to file's content.
+   */
+  function loadFile(name, content) {
+    medium.value(content);
+
+    $('#editor').data('filename', name);
+  }
+
+
   wtc.editor = {
     init: init,
-    medium: medium
+    loadFile: loadFile,
+    medium: medium,
   };
 
 })(window.wtc);
